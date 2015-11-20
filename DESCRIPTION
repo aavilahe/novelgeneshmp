@@ -3,15 +3,17 @@ Title: What the Package Does (one line, title case)
 Version: 0.0.0.9000
 Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
 Description: What the package does (one paragraph).
-Depends:
+Depends: 
     R (>= 3.2.2)
 License: What license is it under?
 LazyData: true
-Imports:
-    jsonlite,
-    dplyr,
-    tidyr,
-    magrittr,
-    entropy,
-    ggplot2
+Imports: 
+    dplyr (>= 0.4.3),
+    tidyr (>= 0.2.0),
+    magrittr (>= 1.5),
+    entropy (>= 1.2.1)
 RoxygenNote: 5.0.0
+Suggests:
+    jsonlite,
+    ggplot2
+    
