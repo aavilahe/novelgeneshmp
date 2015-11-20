@@ -1,8 +1,11 @@
 Package: novelgenes
-Title: What the Package Does (one line, title case)
+Title: Tests For Associations Between FUnkSFAM Presence And Subject Metadata.
 Version: 0.0.0.9000
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+Authors@R: person("Aram", "Avila-Herrera", email = "aram.avilaherrera@gladstone.ucsf.edu", role = c("aut", "cre"))
+Description: This package accompanies the manuscript NOVELGENES_TITLE_HERE.
+    It includes functions used to clean, filter, and analyze data for
+    associations between FUnkSFAM presence and subject metadata in the
+    manuscript. See the vignette for an example.
 Depends: 
     R (>= 3.2.2)
 License: What license is it under?
