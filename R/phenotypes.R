@@ -1,5 +1,9 @@
-# Prepare phenotypes
+# Functions for loading and cleaning subject metadata
 
+#' Load all phenotype data in config file
+#'
+#' @param config_l
+#' @return A list of cleaned data.frames
 load_and_clean_phenotypes = function(config_l){
     # Load
     DCM_raw       = load_pheno(config_l$DCM_fn)
@@ -16,6 +20,12 @@ load_and_clean_phenotypes = function(config_l){
     return(phenos_l)
 }
 
+#' Get phenotype variable names from column names
+#'
+#' NOTE: Names and name regexes are hardcoded
+#'
+#' @param column_names All variable names that may include some phenotype names
+#' @return a vector of phenotype variable names
 get_phenos_from_colnames = function(column_names){
     #column_names = colnames(df)
     pheno_names = column_names[column_names %in%
@@ -32,6 +42,11 @@ get_phenos_from_colnames = function(column_names){
     return(pheno_names)
 }
 
+#' Get VISNO values that can be mapped to samples (SRSIDs).
+#'
+#' @param srs_map A mapping of SRSID to RANDSID, VISNO and other metadata and
+#'                identifiers
+#' @return A vector of mappable VISNO values
 get_mappable_visnos = function(srs_map){
     mappable_visnos = unique(na.omit(srs_map$VISNO))  # get mappable VISNOs (e.g. 1, 2, 3)
     cat('DBG: Returning mappable VISNOs\n', file = stderr())
@@ -39,6 +54,17 @@ get_mappable_visnos = function(srs_map){
     return(mappable_visnos)
 }
 
+#' Inspect phenotype metadata mapping.
+#'
+#' Phenotype data can be mapped to samples of a particular VISNO or to all VISNOs.
+#' However only abundance data was available for VISNO = 1,2,3 and not the
+#' supplementary visits.
+#'
+#' Prints what percentage or counts of samples remain after mapping each way
+#' for the user to inspect.
+#'
+#' @param phenos_l A named list of data.frames with phenotype data
+#' @param mappable_visnos A vector of VISNO values that can be mapped to
 check_mappable_phenos = function(phenos_l, mappable_visnos){
     cat('DBG: ----------------------------------------------------\n', file = stderr())
     cat('DBG: Manual check for mapping reads to phenotype by VISNO\n', file = stderr())
@@ -67,9 +93,17 @@ check_mappable_phenos = function(phenos_l, mappable_visnos){
     sink()
 }
 
+#' Joins VISNO-mappable phenotypes from \code{check_mappable_phenos}.
+#'
+#' NOTE: Hardcoded behavior after inspecting printed output of
+#'       \code{\link{check_mappable_phenos}}
+#'
+#' @param phenos_l A list of named phenotype data.frames
+#' @param mappable_visnos A vector of mappable VISNO values
+#' @return A data.frame of VISNO-mappable phenotypes
+#'         Columns: RANDSID, VISNO, SITE, [PHENONAME1, ...]
+#' @seealso \code{\link{check_mappable_phenos}}
 get_visno_mappable_pheno_df = function(phenos_l, mappable_visnos){
-    # Joins list_of_dfs, selects (RANDSID, VISNO, visno_mappable_phenos...)
-
     visno_mappable_phenos = c(grep('^DCMCODE_', colnames(phenos_l$DCM_df), value = TRUE),
                              'OCPTN_ST', 'EDLVL_BS', 'SMOKER'
                              )
@@ -86,6 +120,18 @@ get_visno_mappable_pheno_df = function(phenos_l, mappable_visnos){
     return(visno_pheno_df)
 }
 
+#' Joins VISNO-unmappable phenotypes from \code{check_mappable_phenos}.
+#'
+#' NOTE: Hardcoded behavior after inspecting printed output of
+#'       \code{\link{check_mappable_phenos}}
+#'
+#' Unmappable phenotypes are mapped to samples from ALL VISNOs.
+#'
+#' @param phenos_l A list of named phenotype data.frames
+#' @param mappable_visnos A vector of mappable VISNO values
+#' @return A data.frame of VISNO-unmappable phenotypes
+#'         Columns: RANDSID, SITE, [PHENONAME1, ...]
+#' @seealso \code{\link{check_mappable_phenos}}
 get_visno_unmappable_pheno_df = function(phenos_l, mappable_visnos){
     # Joins list_of_dfs, selects (RANDSID, visno_unmappable_phenos)
 
