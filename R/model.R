@@ -1,3 +1,16 @@
+# Functions for logistic regression modeling and testing coefficients
+
+#' Make all pairs of FUNKID and PHENONAME from variable column names
+#'
+#' The column names of a data.frame in `tidy` format contain
+#' many FUnkSFAM IDs (FUNKIDs) and many phenotypes variables (PHENONAME)
+#' along with other metadata. This function extracts pairs of FUNKID
+#' and PHENONAME.
+#'
+#' Assumes only FUNKIDs start with 'X'. PHENONAMES are extracted with
+#' \link{\code{get_phenos_from_colnames}}
+#' @param column_names A character vector
+#' @return A data.frame of (FUNKID, PHENONAME) pairs.
 pick_tests = function(column_names){
     ff_names = grep('^X', column_names, value = TRUE)
     #not_ph_names = unique(c(ff_names,
@@ -26,6 +39,16 @@ pick_tests = function(column_names){
     return(ff_ph)
 }
 
+#' Fits glm model, gets coefficient stats, and formats results
+#'
+#' NOTE: if glm() fails, this test is silently skipped
+#'
+#' @param df A data.frame in `tidy` format (rows are observations, columns are
+#'           variables)
+#' @param ff_name FUNKID name to test
+#' @param ph_name PHENONAME to test
+#' @return A data.frame with statistics on coefficients, input variation, and
+#'         sample size
 get_res_df = function(df, ff_name, ph_name){
     the_formula = as.formula(paste(ff_name, '~ SITE +', ph_name))
     the_model = try(
@@ -49,6 +72,12 @@ get_res_df = function(df, ff_name, ph_name){
     }
 }
 
+#' Runs \link{\code{get_res_df}} for each (FUNKID, PHENONAME) pair.
+#'
+#' @param df A data.frame in `tidy` format (rows are observations, columns are
+#'           variables)
+#' @return A data.frame with statistics on coefficients, input variation, and
+#'         sample size
 glm_loop = function(df){
     df %<>% prefilter_by_arbitrary_statistic(
                 calc_PHvariation_per_group(df, group = NULL)
@@ -61,6 +90,14 @@ glm_loop = function(df){
     return(res_df)
 }
 
+#' Tests for significant associations between FUNKIDs and PHENONAMEs per grouping
+#'
+#' Runs \link{\code{glm_loop}} for each \code{HMP_BodySite} or \code{HMP_BodySubsite}
+#'
+#' @param df A data.frame in `tidy` format (rows are observations, columns are
+#'           variables)
+#' @return A data.frame with statistics on coefficients, input variation, and
+#'         sample size
 do_glm_tests = function(df, group_name){
     res_df = df %>% group_by_(.dots = group_name) %>%
                 do({glm_loop(.)}) %>%
@@ -68,6 +105,10 @@ do_glm_tests = function(df, group_name){
     return(res_df)
 }
 
+#' Extract coefficient stats from \code{summary(model)}
+#'
+#' @param the_model
+#' @return A data.frame with \code{summary()} output
 model_to_summary_df = function(the_model){
     summary_df = summary(the_model)$coefficients %>% as.data.frame() %>%
                 add_rownames() %>% tbl_df()
@@ -77,6 +118,19 @@ model_to_summary_df = function(the_model){
     return(summary_df)
 }
 
+#' Get statistics from the cleaned model data.frame in glm()
+#'
+#' Gets Entropy (bits) and ArbitraryStatistic for \code{ph_name}
+#' Gets Entropy (bits) and PercentPresent for \code{ff_name}
+#' Get N_samples (number of rows in glm()$model data.frame)
+#'
+#' DBG NOTE: \code{ff_name} and \code{ph_name} could probably be extracted from
+#'           \code{names(the_model)}
+#'
+#' @param the_model The data.frame from glm()$model
+#' @param ff_name FUNKID tested
+#' @param ph_name PHENONAME tested
+#' @return A data.frame with the model statistics
 get_model_stats = function(the_model, ff_name, ph_name){
     stats_df = data.frame(PHENONAME = ph_name, FUNKID = ff_name,
                           N_samples = the_model$model %>% nrow(),
