@@ -16,7 +16,9 @@ Imports:
     magrittr (>= 1.5),
     entropy (>= 1.2.1)
 RoxygenNote: 5.0.0
-Suggests:
+Suggests: 
     jsonlite,
-    ggplot2
-    
+    ggplot2,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
