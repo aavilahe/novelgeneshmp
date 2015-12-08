@@ -31,7 +31,7 @@ accompanies the manuscript **(Add doi here?)**.
 
 ## Finding associations between subject metadata and FUnkSFAM abundance
 
-The `novelgenes` package contains functions to facilitate tests for association
+The `novelgeneshmp` package contains functions to facilitate tests for association
 between subject metadata from the Human Microbiome Project (HMP) and
 under-annotated protein families.
 
@@ -39,7 +39,7 @@ under-annotated protein families.
 
 #library(devtools)  #dev
 #devtools::load_all()
-library(novelgenes)
+library(novelgeneshmp)
 
 ```
 
@@ -61,7 +61,7 @@ including some filtering steps and specifying output directories.
 
 config_fn = system.file("extdata",
                         "novelgenes_configv.json",
-                        package = "novelgenes"
+                        package = "novelgeneshmp"
                         )
 config_l = load_config(config_fn)
 
@@ -152,11 +152,11 @@ these files and start the example from here.
 
 visno_data_fn = system.file("extdata",
                             paste0(config_l$inspect_dir, "visno_mapped_samples_cleaned.tsv"),
-                            package = "novelgenes"
+                            package = "novelgeneshmp"
                             )
 novisno_data_fn = system.file("extdata",
                             paste0(config_l$inspect_dir, "visno_unmapped_samples_cleaned.tsv"),
-                            package = "novelgenes"
+                            package = "novelgeneshmp"
                             )
 
 # Load (random cleaned data)
@@ -171,7 +171,7 @@ novisno_data_df = load_tsv(novisno_data_fn)
 
 config_l$span67_fn = system.file("extdata",
                                  "span67.tsv",
-                                 package = "novelgenes"
+                                 package = "novelgeneshmp"
                                  )
 
 ```

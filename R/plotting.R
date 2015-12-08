@@ -1,6 +1,6 @@
-#' Functions to plot FUnkSFAM entropy
+# Functions to plot FUnkSFAM entropy
 
-#' Gets 0%, 25%, 50%, 75%, 100% quantiles of a column
+#' Gets 0\%, 25\%, 50\%, 75\%, 100\% quantiles of a column
 #'
 #' Note quantile and percentile used interchangeably here, oops.
 #'

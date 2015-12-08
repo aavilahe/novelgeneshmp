@@ -1,4 +1,4 @@
-Package: novelgenes
+Package: novelgeneshmp
 Title: Tests For Associations Between FUnkSFAM Presence And Subject Metadata.
 Version: 0.0.0.9000
 Authors@R: person("Aram", "Avila-Herrera", email = "aram.avilaherrera@gladstone.ucsf.edu", role = c("aut", "cre"))
