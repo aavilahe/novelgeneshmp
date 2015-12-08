@@ -6,17 +6,17 @@ Description: This package accompanies the manuscript NOVELGENES_TITLE_HERE.
     It includes functions used to clean, filter, and analyze data for
     associations between FUnkSFAM presence and subject metadata in the
     manuscript. See the vignette for an example.
-Depends: 
+Depends:
     R (>= 3.2.2)
 License: GNU General Public License v3.0
 LazyData: true
-Imports: 
+Imports:
     dplyr (>= 0.4.3),
     tidyr (>= 0.2.0),
     magrittr (>= 1.5),
     entropy (>= 1.2.1)
-RoxygenNote: 5.0.0
-Suggests: 
+RoxygenNote: 5.0.1
+Suggests:
     jsonlite,
     ggplot2,
     knitr,
