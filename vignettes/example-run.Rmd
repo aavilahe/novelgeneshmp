@@ -1,64 +1,284 @@
 ---
-title: "Example run"
+title: "Example Analysis"
 author: "Aram Avila-Herrera"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output:
+    html_document:
+        toc: true
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-This is a short vignette that demonstrates the thing.
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
-## Preprocessing
+knitr::opts_chunk$set(fig.width = 8, fig.height = 8)
 
-Coming soon. Generating the raw fake data sets is complicated. In the meantime, please
-enjoy a random cleaned example.
-
-## Preprocessed data
-
-Two tables of random fake data formatted to be ready to use are included. Much of the HMP
-medical data can only be obtained through a data usage agreement.
-
-## 
-
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+<style type="text/css">
+table {
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
+    max-width: 80%;
 
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+}
+</style>
 
-## More Examples
 
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
+This is a short vignette that demonstrates the analysis workflow that
+accompanies the manuscript **(Add doi here?)**.
 
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+## Finding associations between subject metadata and FUnkSFAM abundance
+
+The `novelgenes` package contains functions to facilitate tests for association
+between subject metadata from the Human Microbiome Project (HMP) and
+under-annotated protein families.
+
+```{r, warning = FALSE, messages = FALSE}
+
+library(devtools)
+devtools::load_all()
+# library(novelgenes)  # soon
+
 ```
 
-Also a quote using `>`:
+NB. I like using `dplyr` and `magrittr` for manipulating data.frames, and
+`ggplot2` for plotting.
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+```{r, warning = FALSE, messages = FALSE}
+library(dplyr)
+library(magrittr)
+library(ggplot2)
+```
+
+### Config --- (`json` formatted)
+
+A `json` formatted configuration file drives most of the data cleanup,
+including some filtering steps and specifying output directories.
+
+```{r}
+
+config_fn = system.file("extdata",
+                        "novelgenes_configv.json",
+                        package = "novelgenes"
+                        )
+config_l = load_config(config_fn)
+
+```
+
+#### Example config:
+
+```json
+{
+    "DCM_fn"             : "/path/to/phs000228.v3.pht001187.v3.p1.c1.EMMES_HMP_DCM.HMP.txt",
+    "DSU_fn"             : "/path/to/phs000228.v3.pht002156.v1.p1.c1.EMMES_HMP_DSU.HMP.csv",
+    "DEM_fn"             : "/path/to/phs000228.v3.pht002158.v1.p1.c1.EMMES_HMP_DEM_ENR.HMP.txt",
+    "DTPDHXDVD_fn"       : "/path/to/phs000228.v3.pht002157.v1.p1.c1.EMMES_HMP_DTP_DHX_DVD.HMP.csv",
+    "GTV_fn"             : "/path/to/phs000228.v3.pht001193.v3.p1.c1.EMMES_HMP_GTV.HMP.txt",
+
+    "counts_fn"          : "/path/to/HMP_funksfams_counts.csv",
+
+    "project_catalog_fn" : "/path/to/HMP_project_catalog.csv",
+    "srs2randsid_fn"     : "/path/to/SRSID2RANDSID.tsv",
+    "srs2visno_fn"       : "/path/to/ppAll_V35_map.txt",
+
+    "count_threshold"    : 1,
+
+    "span67_fn"          : "/path/to/span67.tsv",
+
+    "output_dir"         : "./output_dir/",
+    "inspect_dir"        : "./inspect_dir/"
+}
+
+```
+
+#### Subject variables
+
+| config attribute | data          | variables                                          |
+|:-----------------|:--------------|:---------------------------------------------------|
+| `DCM_fn`         | DCM           | Medications                                        |
+| `DSU_fn`         | DSU           | Diet                                               |
+| `DEM_fn`         | DEM           | Birthcountry                                       |
+| `DTPDHXDVD_fn`   | DTP DHX DVD   | BMI, smoker status, occupation, etc...             |
+| `GTV_fn`         | GTV           | Used for `RANDSID` to (`SRSID`, `VISNO`) mapping   |
+
+#### FUnkSFAM read counts (abundance -> presence-absence)
+
+`counts_fn`:
+
+- Csv formatted
+- Each row is a FUnkSFAM
+- First column is a FUnkSFAM
+- Other columns are counts for each `SRSID`
+
+`count_threshold`:
+
+- FUnkSFAMs considered present if there are more than `count_threshold` read
+  counts
+
+#### Other data and mappings
+
+| config attribute         | data                                       | variables                                          |
+|:-------------------------|:-------------------------------------------|:---------------------------------------------------|
+| `project_catalog_fn`     | HMP project catalog                        | Body site and subsites                             |
+| `srs2randsid_fn`         | A mapping from SRSID to RANDSID            | `SRSID`, `RANDSID`                                 |
+| `srs2visno_fn`           | A mapping from SRSID to VISNO              | `SRSID`, `VISNO` *only contains VISNO = {1, 2, 3}* |
+| `span67_fn`              | Number of annotations across databases     | `FUNKID`, `N_annotations`                          |
+
+#### Output
+
+These attributes aren't required, but they are handy. They can be used to create
+directories if they don't exist.
+
+- `output_dir`: Put results here
+- `inspect_dir`: Put intermediate files here
+
+### Pre-processing
+
+Coming soon. Generating the raw fake data sets is complicated. In the meantime,
+please enjoy a random cleaned example.
+
+### Pre-processed data
+
+Two tables of random fake data formatted to be ready to use are included. Much
+of the HMP medical data can only be obtained through a data usage agreement.
+
+After loading the raw data, cleaned tab-separated-value files are typically
+placed in `inspect_dir` with other intermediate files and graphs. We can load
+these files and start the example from here.
+
+```{r}
+
+visno_data_fn = system.file("extdata",
+                            paste0(config_l$inspect_dir, "visno_mapped_samples_cleaned.tsv"),
+                            package = "novelgenes"
+                            )
+novisno_data_fn = system.file("extdata",
+                            paste0(config_l$inspect_dir, "visno_unmapped_samples_cleaned.tsv"),
+                            package = "novelgenes"
+                            )
+
+# Load (random cleaned data)
+visno_data_df = load_tsv(visno_data_fn)
+novisno_data_df = load_tsv(novisno_data_fn)
+
+```
+
+`span67_fn` is also included.
+
+```{r, warning = FALSE, results = 'hide'}
+
+config_l$span67_fn = system.file("extdata",
+                                 "span67.tsv",
+                                 package = "novelgenes"
+                                 )
+
+```
+
+### Variable summaries
+
+Get summaries for phenotypes (subject metadata) and FUnkSFAM abundance
+(presence-absence).
+
+```{r}
+
+# Number of samples per body (sub)site for data that maps to VISNO of origin
+# and for data that is not expected to change across VISNOs
+nsamples_by_bodysite_df = bind_rows(
+    calc_nsamples_per_group(visno_data_df, 'HMP_BodySite') %>%
+        mutate(VISNO_MAPPED = TRUE),
+    calc_nsamples_per_group(novisno_data_df, 'HMP_BodySite') %>%
+        mutate(VISNO_MAPPED = FALSE)
+    )
+
+# FUnkSFAM variation statistics by body (sub)site.
+ff_stats_bss_df = calc_FFvariation_per_group(novisno_data_df, 'HMP_BodySubsite')
+
+# Phenotype (subject metadata variable) variation statistics.
+ph_stats_bs_df = bind_rows(calc_PHvariation_per_group(visno_data_df, 'HMP_BodySite'),
+                           calc_PHvariation_per_group(novisno_data_df, 'HMP_BodySite')
+                           )
+
+```
+
+We can view the summaries:
+
+```{r}
+
+head(nsamples_by_bodysite_df)
+head(ph_stats_bs_df)
+
+```
+
+and/or save them to file, perhaps somewhere in `inspect_dir`:
+
+```r
+save_tsv(nsamples_by_bodysite_df,
+         paste0(config_l$inspect_dir, 'nsamples_by_bodysite.tsv')
+         )
+
+```
+
+or plot them:
+
+```{r, warning = FALSE}
+
+plot_FFentropy_by_group(ff_stats_bss_df, 'HMP_BodySubsite')
+
+```
+
+## Fit models and test for significantly large coefficients
+
+Model each FUnkSFAM's abundance as a function of each subject variable,
+accounting for `SITE` and stratified by body site or subsite.
+
+To cut down on computate time, `do_glm_tests()` calls
+`prefilter_by_arbitrary_statistic()` to skip modelling if there is not enough
+variation in the subject variable (e.g.  everyone is a vegetarian).
+
+```{r, warning = FALSE}
+
+res_by_bodysite_df = bind_rows(
+    do_glm_tests(visno_data_df, 'HMP_BodySite'),
+    do_glm_tests(novisno_data_df, 'HMP_BodySite')
+    )
+res_by_bodysubsite_df = bind_rows(
+    do_glm_tests(visno_data_df, 'HMP_BodySubsite'),
+    do_glm_tests(novisno_data_df, 'HMP_BodySubsite')
+    )
+
+head(res_by_bodysite_df)
+head(res_by_bodysubsite_df)
+
+```
+
+## Post-filtering and p-value correction
+
+To avoid a high penalty for multiple testing, we *a priori* decide to focus on
+a specific subset of tests.
+
+### Filtering functions
+
+| name                                             | removes tests for...                                             |
+|:-------------------------------------------------|:-----------------------------------------------------------------|
+| `filter_results_by_FFentropy_per_group`          | mostly present or absent FUnkSFAMs                               |
+| `filter_results_by_funksfam_annotation`          | phylogenetically narrow FUnkSFAMs or with 10 or more annotations |
+| `filter_results_by_per_test_arbitrary_statistic` | subject variable with few differeing values                      |
+| `filter_results_by_interesting_DCMCODE`          | keeps a hardcoded set of DCMCODEs                                |
+| `filter_unneeded_tests`                          | `SITE` and `(Intercept)` coefficients                            |
+| `filter_results_all`                             | all of the above                                                 |
+
+```{r}
+
+res_bss_fil_df = filter_results_all(res_by_bodysubsite_df, ff_stats_bss_df,
+                                    'HMP_BodySubsite', config_l
+                                    )
+
+res_bss_fil_df %>% adjust_pvalues() %>% format_final_results() -> res_bss_df
+
+#dir.create(config_l$output_dir, showWarnings = FALSE)
+#save_tsv(res_bss_df, paste0(config_l$output_dir, 'adjusted_results_by_bodysubsite.tsv'))
+head(res_bss_df)
+
+```
