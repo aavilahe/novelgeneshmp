@@ -1,4 +1,9 @@
-# load file formats
+# Function to load and save various files and file formats
+
+#' Load a csv file with a header
+#'
+#' @param fn A filename
+#' @return A data.frame
 load_csv = function(fn){
     df = tbl_df(
                 read.csv(fn, header = TRUE, sep = ',',
@@ -8,6 +13,10 @@ load_csv = function(fn){
     return(df)
 }
 
+#' Load a tab-separated value file with a header
+#'
+#' @param fn A filename
+#' @return A data.frame
 load_tsv = function(fn){
     df = tbl_df(
                 read.table(fn, header = TRUE, sep = '\t',
@@ -18,10 +27,14 @@ load_tsv = function(fn){
 }
 
 
-# load raw phenotype data (DSU, DCM, etc...)
+#' Load raw phenotype data (DSU, DCM, etc...)
+#'
+#' Checks extension if \code{\link{load_tsv}} or
+#' \code{\link{load_csv}} should be called
+#'
+#' @param fn A filename
+#' @return A data.frame with the phenotype data
 load_pheno = function(fn){
-    # Reads csv or txt files based on file name
-
     if(grepl('.txt$', fn)){
         # Load txt file
         pheno_df = load_tsv(fn)
@@ -32,18 +45,18 @@ load_pheno = function(fn){
     return(pheno_df)
 }
 
-# load abundance data (as counts)
+#' Load abundance data (as counts)
+#'
+#' Loads and transposes counts csv
+#' where each row is a FUnkSFAM. The first column is a FUNKSFAM ID,
+#' other columns are counts for each SRSID
+#'
+#' @param fn A filename
+#' @return A data.frame with each row a sample and FUnkSFAMs as columns
 load_counts = function(fn){
-    # Loads and transposes counts csv
-    #
-    # Each row is a funkfam
-    # First column is a FUNKSFAM ID, other columns are counts for each SRSID
-    #
-    # Returns a tbl_df with each row a sample and funkfams as columns
-
     cnts_df = load_csv(fn)
     colnames(cnts_df)[1] = 'FUNKID'
-    cnts_df$X.1 = NULL
+    cnts_df$X.1 = NULL  # There was an extra column to delete
     cnts_df %<>% gather(key = 'SRSID', value = 'Counts', -FUNKID) %>%
               select(FUNKID, SRSID, Counts) %>%
               mutate(FUNKID = paste('X', FUNKID, sep = '')) %>%  # "X" preprended to colnames
@@ -54,12 +67,15 @@ load_counts = function(fn){
 }
 
 
-# load various specific maps
+#' Load various specific maps
+#'
+#' Reads HMP project catalog in csv format
+#' and selects Sequence.Read.Archive.ID, HMP.Isolation.Body.Site, HMP.Isolation.Body.Subsite
+#' renames columns to SRSID, HMP_BodySite, HMP_BodySubsite
+#'
+#' @param fn A filename
+#' @return A data.frame with SRSIDs mapped to body sites and subsites
 load_bodysites = function(fn){
-    # Reads HMP project catalog in csv format
-    # and selects Sequence.Read.Archive.ID, HMP.Isolation.Body.Site, HMP.Isolation.Body.Subsite
-    # renames columns to SRSID, HMP_BodySite, HMP_BodySubsite
-
     srs_bodysites_df = load_csv(fn) %>%
                             rename(SRSID = Sequence.Read.Archive.ID,
                                    HMP_BodySite = HMP.Isolation.Body.Site,
@@ -70,11 +86,11 @@ load_bodysites = function(fn){
     return(srs_bodysites_df)
 }
 
+#' Loads a mapping found in ppAll_V35_map.txt
+#'
+#' @param fn A filename
+#' @return A data.frame mapping of SRSID to VISNO (and SN for good measure)
 load_srs2visno = function(fn){
-    # Loads a mapping found in ppAll_V35_map.txt
-    #
-    # Returns mapping of SRSID to VISNO (and SN for good measure)
-
     srs2visno_df = load_tsv(fn) %>%
                         select(SRSID = SRS_SampleID,
                                VISNO = VisitNo,
@@ -88,10 +104,14 @@ load_srs2visno = function(fn){
     return(srs2visno_df)
 }
 
-load_srs2randsid = function(fn){
-    # Loads map from SRSID to RANDSID
-    # maps metagenomic sample IDs to randomized patient IDs
 
+#' Loads a mapping from SRSID to RANDSID
+#'
+#' Maps metagenomic sample IDs to randomized patient IDs
+#'
+#' @param fn A filename
+#' @return A data.frame mapping RANDSID to SRSID
+load_srs2randsid = function(fn){
     srs2randsid_df = load_tsv(fn) %>%
                         rename(RANDSID = dbGaP.SubjID) %>%  # Fixes column name
                         mutate(SRSID = as.character(SRSID),  # Enforce types
@@ -100,6 +120,13 @@ load_srs2randsid = function(fn){
     return(srs2randsid_df)
 }
 
+#' Saves a data.frame to a tab-separated value file
+#'
+#' Writes column names as header, No rownames, No quotes.
+#'
+#' @param df A data.frame to save
+#' @param fn A filename to save the df to
+#' @seealso load_tsv, load_csv
 save_tsv = function(df, fn){
     write.table(df, file = fn,
                 sep = '\t',
@@ -108,6 +135,13 @@ save_tsv = function(df, fn){
                 )
 }
 
+#' Formats final results
+#'
+#' Selects interesting results to print, sorts by adjusted and
+#' unadjusted p-values
+#'
+#' @param res_df A data.frame of results
+#' @return A formatted res_df
 format_final_results = function(res_df){
     # choose columns and order to report in table
     res_df %<>% select(matches('^HMP_BodyS(ite|ubsite)$'),

@@ -92,7 +92,7 @@ calc_PHvariation_per_group = function(df, group){
     return(variation_df)
 }
 
-#' DEPRECATED. Use \code{\linke{calc_PHvariation_per_group}}
+#' DEPRECATED. Use \code{\link{calc_PHvariation_per_group}}
 calc_PHas_per_group = function(df, group){
     column_names = colnames(df)
     #pheno_names = column_names[column_names %in%

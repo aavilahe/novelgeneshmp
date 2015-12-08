@@ -1,35 +1,51 @@
-# clean up this metadata
-# Functions to clean up selected phenotypes
+#Functions for cleaning subject variables
 
-# Superkeys
+## Superkeys for HMP tables
+
+#' DCM superkey
 DCM_sk = c('PROT',
            'PROTSEG',
            'SITE',
            'RANDSID',
            'MEDNUM'
            )
+
+#' DTPDHXDVD superkey
 DTPDHXDVD_sk = c('PROT',
                  'PROTSEG',
                  'SITE',
                  'RANDSID',
                  'VISNO'
                  )
+
+#' DSU superkey
 DSU_sk = c('PROT',
            'PROTSEG',
            'SITE',
            'RANDSID'
            )
+
+#' DEM superkey
 DEM_sk = c('PROT',
            'protseg',  # Note lowercase!
            'SITE',
            'RANDSID'
            )
 
+#' Extracts medication information from \code{DCM_df}
+#'
+#' Extract medication information from DCM data.frame
+#' per patient (\code{RANDSID}) per visit (\code{VISNO})
+#'
+#' @param DCM_df A data.frame with \code{DCM} contents
+#' @param DTPDHXDVD A data.frame with \code{DTP DHX DVD} contents
+#' @return A data.frame with cleaned DCM data.
+#'          Rows are samples indexed by a superkey
+#'          Columns are various DCMCODEs or the superkey
+#' @seealso \code{\link{DCM_sk}}
 clean_dcm = function(DCM_df, DTPDHXDVD_df){
-    # Extracts medication information from DCM_df
-    # per patient (RANDSID) per visit (VISNO)
-
     # For each visit figure out if medication was being taken
+
     DCM_df = left_join(DTPDHXDVD_df %>%
                            select(one_of(DTPDHXDVD_sk), study_day),
                        DCM_df %>%
@@ -73,8 +89,19 @@ clean_dcm = function(DCM_df, DTPDHXDVD_df){
     return(DCM_df)
 }
 
+#' Extracts diet information from \code{DSU_df}
+#'
+#' Extract diet information from DSU data.frame
+#' per patient (\code{RANDSID}).
+#'
+#' @param DSU_df A data.frame with \code{DSU} contents
+#' @return A data.frame with cleaned DSU data.
+#'          Rows are samples indexed by a superkey
+#'          Columns are DSUBFED, DSUDIET, or the superkey
+#' @seealso \code{\link{DSU_sk}}
 clean_dsu = function(DSU_df){
     # We only want DSUBFED and DSUDIET
+
     DSU_df = DSU_df %>% select(one_of(DSU_sk), DSUBFED, DSUDIET) %>%
                         mutate(PROT = as.integer(PROT),           # Enforce types
                                PROTSEG = as.character(PROTSEG),
@@ -85,6 +112,18 @@ clean_dsu = function(DSU_df){
     return(DSU_df)
 }
 
+
+#' Extracts demographic information from \code{DEM_df}
+#'
+#' Extract demographic information from DEM data.frame
+#' per patient (\code{RANDSID}). Currently only checks
+#' if patient was born in USA/Canada or not.
+#'
+#' @param DEM_df A data.frame with \code{DEM} contents
+#' @return A data.frame with cleaned DEM data.
+#'          Rows are samples indexed by a superkey
+#'          Columns are MURICA or the superkey
+#' @seealso \code{\link{DEM_sk}}
 clean_dem = function(DEM_df){
     # We only want BRTHCTRY, and we're going to change it to USA/Canada or not
     # Don't trust data dictionary's "coded values"; double check with BRTHCTRY_C
@@ -99,6 +138,18 @@ clean_dem = function(DEM_df){
     return(DEM_df)
 }
 
+#' Extracts lifestyle information from \code{DTPDHXDVD_df}
+#'
+#' Extract lifestyle information from DTPDHXDVD data.frame
+#' per patient (\code{RANDSID}) per (\code{VISNO}).
+#' Currently checks for Bachelors degree, student status, smoker status,
+#' and BMI.
+#'
+#' @param DTPDHXDVD_df A data.frame with \code{DTPDHXDVD} contents
+#' @return A data.frame with cleaned DTPDHXDVD data.
+#'          Rows are samples indexed by a superkey
+#'          Columns are lifestyle variables or the superkey
+#' @seealso \code{\link{DTPDHXDVD_sk}}
 clean_dtpdhxdvd = function(DTPDHXDVD_df){
     # Gets Education, Occupation
     # Splits BMI into three categoris
@@ -141,6 +192,12 @@ clean_dtpdhxdvd = function(DTPDHXDVD_df){
     return(DTPDHXDVD_df)
 }
 
+#' Extracts RANDSID, VISNO, SN from GTV
+#'
+#' Strips leading zeros from primary visits \code{VISNO = (1, 2, 3)}
+#'
+#' @param GTV_df A data.frame with GTV contents
+#' @return A cleaned GTV data.frame with RANDSID, VISNO, SN mapping
 clean_gtv = function(GTV_df){
     GTV_df = GTV_df %>% select(SN, RANDSID, VISNO) %>% unique() %>%
                         # Strip leading 0 for integer-like VISNOs (01 -> 1; 01S -> 01S)

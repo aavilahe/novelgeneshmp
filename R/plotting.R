@@ -1,10 +1,25 @@
+#' Functions to plot FUnkSFAM entropy
 
+#' Gets 0%, 25%, 50%, 75%, 100% quantiles of a column
+#'
+#' Note quantile and percentile used interchangeably here, oops.
+#'
+#' @param column A numeric column
+#' @return A data.frame with percentiles and percentile values
 get_quantiles_df = function(column){
     quantile_df = data.frame(PercentileValue = quantile(column)) %>%
                         add_rownames(var = "Percentile")
     return(quantile_df)
 }
 
+#' Makes a histogram of FUnkSFAM entropies per group
+#'
+#' Uses ggplot2.
+#'
+#' @param ff_stats_df A data.frame of FUnkSFAM entropies
+#'                     calculated by calc_FFvariation_per_group()
+#' @param group Either 'HMP_BodySite' or 'HMP_Bodysubsite'
+#' @return A ggplot2 object
 plot_FFentropy_by_group = function(ff_stats_df, group){
     quantile_df = ff_stats_df %>% group_by_(.dots = group) %>%
                         do({get_quantiles_df(.$Entropy_bits)})
