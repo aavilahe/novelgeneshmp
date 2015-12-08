@@ -2,7 +2,9 @@
 title: "Example Analysis"
 author: "Aram Avila-Herrera"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
+output:
+    html_document:
+        toc: true
 vignette: >
   %\VignetteIndexEntry{Vignette Title}
   %\VignetteEngine{knitr::rmarkdown}
@@ -11,9 +13,17 @@ vignette: >
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 
-knitr::opts_chunk$set(fig.width=8, fig.height=8)
+knitr::opts_chunk$set(fig.width = 8, fig.height = 8)
 
 ```
+
+<style type="text/css">
+table {
+
+    max-width: 80%;
+
+}
+</style>
 
 
 This is a short vignette that demonstrates the analysis workflow that
@@ -85,13 +95,13 @@ config_l = load_config(config_fn)
 
 #### Subject variables
 
-| config key     | data        | variables                                        |
-|:---------------|:------------|:-------------------------------------------------|
-| `DCM_fn`       | DCM         | Medications                                      |
-| `DSU_fn`       | DSU         | Diet                                             |
-| `DEM_fn`       | DEM         | Birthcountry                                     |
-| `DTPDHXDVD_fn` | DTP DHX DVD | BMI, smoker status, occupation, etc...           |
-| `GTV_fn`       | GTV         | Used for `RANDSID` to (`SRSID`, `VISNO`) mapping |
+| config attribute | data          | variables                                          |
+|:-----------------|:--------------|:---------------------------------------------------|
+| `DCM_fn`         | DCM           | Medications                                        |
+| `DSU_fn`         | DSU           | Diet                                               |
+| `DEM_fn`         | DEM           | Birthcountry                                       |
+| `DTPDHXDVD_fn`   | DTP DHX DVD   | BMI, smoker status, occupation, etc...             |
+| `GTV_fn`         | GTV           | Used for `RANDSID` to (`SRSID`, `VISNO`) mapping   |
 
 #### FUnkSFAM read counts (abundance -> presence-absence)
 
@@ -109,16 +119,16 @@ config_l = load_config(config_fn)
 
 #### Other data and mappings
 
-| config key           | data                                   | variables                                      |
-|:---------------------|:---------------------------------------|:-----------------------------------------------|
-| `project_catalog_fn` | HMP project catalog                    | Body site and subsites                         |
-| `srs2randsid_fn`     | A mapping from SRSID to RANDSID        | SRSID, RANDSID                                 |
-| `srs2visno_fn`       | A mapping from SRSID to VISNO          | SRSID, VISNO *only contains VISNO = {1, 2, 3}* |
-| `span67_fn`          | Number of annotations across databases | FUNKID, N_annotations                          |
+| config attribute         | data                                       | variables                                          |
+|:-------------------------|:-------------------------------------------|:---------------------------------------------------|
+| `project_catalog_fn`     | HMP project catalog                        | Body site and subsites                             |
+| `srs2randsid_fn`         | A mapping from SRSID to RANDSID            | `SRSID`, `RANDSID`                                 |
+| `srs2visno_fn`           | A mapping from SRSID to VISNO              | `SRSID`, `VISNO` *only contains VISNO = {1, 2, 3}* |
+| `span67_fn`              | Number of annotations across databases     | `FUNKID`, `N_annotations`                          |
 
 #### Output
 
-These keys aren't required, but they are handy. They can be used to create
+These attributes aren't required, but they are handy. They can be used to create
 directories if they don't exist.
 
 - `output_dir`: Put results here
@@ -250,14 +260,14 @@ a specific subset of tests.
 
 ### Filtering functions
 
-| name                                           | removes tests for...                                             |
-|:-----------------------------------------------|:-----------------------------------------------------------------|
-| filter_results_by_FFentropy_per_group          | mostly present or absent FUnkSFAMs                               |
-| filter_results_by_funksfam_annotation          | phylogenetically narrow FUnkSFAMs or with 10 or more annotations |
-| filter_results_by_per_test_arbitrary_statistic | subject variable with few differeing values                      |
-| filter_results_by_interesting_DCMCODE          | keeps a hardcoded set of DCMCODEs                                |
-| filter_unneeded_tests                          | `SITE` and `(Intercept)` coefficients                            |
-| filter_results_all                             | all of the above                                                 |
+| name                                             | removes tests for...                                             |
+|:-------------------------------------------------|:-----------------------------------------------------------------|
+| `filter_results_by_FFentropy_per_group`          | mostly present or absent FUnkSFAMs                               |
+| `filter_results_by_funksfam_annotation`          | phylogenetically narrow FUnkSFAMs or with 10 or more annotations |
+| `filter_results_by_per_test_arbitrary_statistic` | subject variable with few differeing values                      |
+| `filter_results_by_interesting_DCMCODE`          | keeps a hardcoded set of DCMCODEs                                |
+| `filter_unneeded_tests`                          | `SITE` and `(Intercept)` coefficients                            |
+| `filter_results_all`                             | all of the above                                                 |
 
 ```{r}
 
