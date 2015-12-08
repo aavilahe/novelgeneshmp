@@ -1,0 +1,22 @@
+{
+    "DCM_fn"             : "/path/to/phs000228.v3.pht001187.v3.p1.c1.EMMES_HMP_DCM.HMP.txt",
+    "DSU_fn"             : "/path/to/phs000228.v3.pht002156.v1.p1.c1.EMMES_HMP_DSU.HMP.csv",
+    "DEM_fn"             : "/path/to/phs000228.v3.pht002158.v1.p1.c1.EMMES_HMP_DEM_ENR.HMP.txt",
+    "DTPDHXDVD_fn"       : "/path/to/phs000228.v3.pht002157.v1.p1.c1.EMMES_HMP_DTP_DHX_DVD.HMP.csv",
+    "GTV_fn"             : "/path/to/phs000228.v3.pht001193.v3.p1.c1.EMMES_HMP_GTV.HMP.txt",
+
+    "counts_fn"          : "/path/to/HMP_funksfams_counts.csv",
+
+    "project_catalog_fn" : "/path/to/HMP_project_catalog.csv",
+    "srs2randsid_fn"     : "/path/to/SRSID2RANDSID.tsv",
+    "srs2visno_fn"       : "/path/to/ppAll_V35_map.txt",
+
+    "count_threshold"    : 1,
+
+    "span67_fn"          : "/path/to/span67.tsv",
+
+    "output_dir"         : "./output_dir/",
+    "inspect_dir"        : "./inspect_dir/"
+}
+
+
