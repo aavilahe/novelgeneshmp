@@ -136,8 +136,35 @@ directories if they don't exist.
 
 ### Pre-processing
 
-Coming soon. Generating the raw fake data sets is complicated. In the meantime,
-please enjoy a random cleaned example.
+In progress. Generating the raw fake data sets is complicated, but
+this is how one would pre-process the raw HMP subject metadata.
+
+```r
+
+phenos_l = load_and_clean_phenotypes(config_l)
+pres_df = prepare_abundance(config_l)  # presence-abscence
+srs_map = prepare_map(config_l)
+
+mappable_visnos = get_mappable_visnos(srs_map)
+
+# Inspect printed output for DCMCODE_XX, etc...
+check_mappable_phenos(phenos_l, mappable_visnos)
+
+
+# make phenotype tables
+
+ph_vm = get_visno_mappable_pheno_df(phenos_l, mappable_visnos)
+ph_vu = get_visno_unmappable_pheno_df(phenos_l, mappable_visnos)
+
+
+# merge phenotype tables with presence/abscence tables
+
+visno_data_df = Reduce(inner_join, list(pres_df, srs_map, ph_vm))
+novisno_data_df = Reduce(inner_join, list(pres_df, srs_map, ph_vu))
+
+```
+
+In the meantime, please enjoy a random cleaned example.
 
 ### Pre-processed data
 
