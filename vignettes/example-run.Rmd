@@ -37,9 +37,9 @@ under-annotated protein families.
 
 ```{r, warning = FALSE, messages = FALSE}
 
-library(devtools)
-devtools::load_all()
-# library(novelgenes)  # soon
+#library(devtools)  #dev
+#devtools::load_all()
+library(novelgenes)
 
 ```
 

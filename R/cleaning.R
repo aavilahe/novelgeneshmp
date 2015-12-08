@@ -43,6 +43,7 @@ DEM_sk = c('PROT',
 #'          Rows are samples indexed by a superkey
 #'          Columns are various DCMCODEs or the superkey
 #' @seealso \code{\link{DCM_sk}}
+#' @export
 clean_dcm = function(DCM_df, DTPDHXDVD_df){
     # For each visit figure out if medication was being taken
 
@@ -99,6 +100,7 @@ clean_dcm = function(DCM_df, DTPDHXDVD_df){
 #'          Rows are samples indexed by a superkey
 #'          Columns are DSUBFED, DSUDIET, or the superkey
 #' @seealso \code{\link{DSU_sk}}
+#' @export
 clean_dsu = function(DSU_df){
     # We only want DSUBFED and DSUDIET
 
@@ -124,6 +126,7 @@ clean_dsu = function(DSU_df){
 #'          Rows are samples indexed by a superkey
 #'          Columns are MURICA or the superkey
 #' @seealso \code{\link{DEM_sk}}
+#' @export
 clean_dem = function(DEM_df){
     # We only want BRTHCTRY, and we're going to change it to USA/Canada or not
     # Don't trust data dictionary's "coded values"; double check with BRTHCTRY_C
@@ -150,6 +153,7 @@ clean_dem = function(DEM_df){
 #'          Rows are samples indexed by a superkey
 #'          Columns are lifestyle variables or the superkey
 #' @seealso \code{\link{DTPDHXDVD_sk}}
+#' @export
 clean_dtpdhxdvd = function(DTPDHXDVD_df){
     # Gets Education, Occupation
     # Splits BMI into three categoris
@@ -198,6 +202,7 @@ clean_dtpdhxdvd = function(DTPDHXDVD_df){
 #'
 #' @param GTV_df A data.frame with GTV contents
 #' @return A cleaned GTV data.frame with RANDSID, VISNO, SN mapping
+#' @export
 clean_gtv = function(GTV_df){
     GTV_df = GTV_df %>% select(SN, RANDSID, VISNO) %>% unique() %>%
                         # Strip leading 0 for integer-like VISNOs (01 -> 1; 01S -> 01S)

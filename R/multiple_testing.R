@@ -4,6 +4,7 @@
 #'
 #' @param res_df A data.frame of results
 #' @return res_df with adjust p-values
+#' @export
 adjust_pvalues = function(res_df){
 
     res_df %<>% mutate(p_adj_fdr = p.adjust(p_value, method = 'fdr'))

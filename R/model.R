@@ -11,6 +11,7 @@
 #' \link{\code{get_phenos_from_colnames}}
 #' @param column_names A character vector
 #' @return A data.frame of (FUNKID, PHENONAME) pairs.
+#' @export
 pick_tests = function(column_names){
     ff_names = grep('^X', column_names, value = TRUE)
     #not_ph_names = unique(c(ff_names,
@@ -49,6 +50,7 @@ pick_tests = function(column_names){
 #' @param ph_name PHENONAME to test
 #' @return A data.frame with statistics on coefficients, input variation, and
 #'         sample size
+#' @export
 get_res_df = function(df, ff_name, ph_name){
     the_formula = as.formula(paste(ff_name, '~ SITE +', ph_name))
     the_model = try(
@@ -78,6 +80,7 @@ get_res_df = function(df, ff_name, ph_name){
 #'           variables)
 #' @return A data.frame with statistics on coefficients, input variation, and
 #'         sample size
+#' @export
 glm_loop = function(df){
     df %<>% prefilter_by_arbitrary_statistic(
                 calc_PHvariation_per_group(df, group = NULL)
@@ -98,6 +101,7 @@ glm_loop = function(df){
 #'           variables)
 #' @return A data.frame with statistics on coefficients, input variation, and
 #'         sample size
+#' @export
 do_glm_tests = function(df, group_name){
     res_df = df %>% group_by_(.dots = group_name) %>%
                 do({glm_loop(.)}) %>%
@@ -109,6 +113,7 @@ do_glm_tests = function(df, group_name){
 #'
 #' @param the_model
 #' @return A data.frame with \code{summary()} output
+#' @export
 model_to_summary_df = function(the_model){
     summary_df = summary(the_model)$coefficients %>% as.data.frame() %>%
                 add_rownames() %>% tbl_df()
@@ -131,6 +136,7 @@ model_to_summary_df = function(the_model){
 #' @param ff_name FUNKID tested
 #' @param ph_name PHENONAME tested
 #' @return A data.frame with the model statistics
+#' @export
 get_model_stats = function(the_model, ff_name, ph_name){
     stats_df = data.frame(PHENONAME = ph_name, FUNKID = ff_name,
                           N_samples = the_model$model %>% nrow(),

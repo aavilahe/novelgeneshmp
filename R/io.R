@@ -4,6 +4,7 @@
 #'
 #' @param fn A filename
 #' @return A data.frame
+#' @export
 load_csv = function(fn){
     df = tbl_df(
                 read.csv(fn, header = TRUE, sep = ',',
@@ -17,6 +18,7 @@ load_csv = function(fn){
 #'
 #' @param fn A filename
 #' @return A data.frame
+#' @export
 load_tsv = function(fn){
     df = tbl_df(
                 read.table(fn, header = TRUE, sep = '\t',
@@ -34,6 +36,7 @@ load_tsv = function(fn){
 #'
 #' @param fn A filename
 #' @return A data.frame with the phenotype data
+#' @export
 load_pheno = function(fn){
     if(grepl('.txt$', fn)){
         # Load txt file
@@ -53,6 +56,7 @@ load_pheno = function(fn){
 #'
 #' @param fn A filename
 #' @return A data.frame with each row a sample and FUnkSFAMs as columns
+#' @export
 load_counts = function(fn){
     cnts_df = load_csv(fn)
     colnames(cnts_df)[1] = 'FUNKID'
@@ -75,6 +79,7 @@ load_counts = function(fn){
 #'
 #' @param fn A filename
 #' @return A data.frame with SRSIDs mapped to body sites and subsites
+#' @export
 load_bodysites = function(fn){
     srs_bodysites_df = load_csv(fn) %>%
                             rename(SRSID = Sequence.Read.Archive.ID,
@@ -90,6 +95,7 @@ load_bodysites = function(fn){
 #'
 #' @param fn A filename
 #' @return A data.frame mapping of SRSID to VISNO (and SN for good measure)
+#' @export
 load_srs2visno = function(fn){
     srs2visno_df = load_tsv(fn) %>%
                         select(SRSID = SRS_SampleID,
@@ -111,6 +117,7 @@ load_srs2visno = function(fn){
 #'
 #' @param fn A filename
 #' @return A data.frame mapping RANDSID to SRSID
+#' @export
 load_srs2randsid = function(fn){
     srs2randsid_df = load_tsv(fn) %>%
                         rename(RANDSID = dbGaP.SubjID) %>%  # Fixes column name
@@ -127,6 +134,7 @@ load_srs2randsid = function(fn){
 #' @param df A data.frame to save
 #' @param fn A filename to save the df to
 #' @seealso load_tsv, load_csv
+#' @export
 save_tsv = function(df, fn){
     write.table(df, file = fn,
                 sep = '\t',
@@ -142,6 +150,7 @@ save_tsv = function(df, fn){
 #'
 #' @param res_df A data.frame of results
 #' @return A formatted res_df
+#' @export
 format_final_results = function(res_df){
     # choose columns and order to report in table
     res_df %<>% select(matches('^HMP_BodyS(ite|ubsite)$'),

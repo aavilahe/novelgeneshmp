@@ -6,6 +6,7 @@
 #'
 #' @param column A numeric column
 #' @return A data.frame with percentiles and percentile values
+#' @export
 get_quantiles_df = function(column){
     quantile_df = data.frame(PercentileValue = quantile(column)) %>%
                         add_rownames(var = "Percentile")
@@ -20,6 +21,7 @@ get_quantiles_df = function(column){
 #'                     calculated by calc_FFvariation_per_group()
 #' @param group Either 'HMP_BodySite' or 'HMP_Bodysubsite'
 #' @return A ggplot2 object
+#' @export
 plot_FFentropy_by_group = function(ff_stats_df, group){
     quantile_df = ff_stats_df %>% group_by_(.dots = group) %>%
                         do({get_quantiles_df(.$Entropy_bits)})

@@ -11,6 +11,7 @@
 #'                    \code{\link{calc_FFvariation_per_group()}}
 #' @param group Either 'HMP_Bodysite' or 'HMP_Bodysubsite'
 #' @return A filtered res_df
+#' @export
 filter_results_by_FFentropy_per_group = function(res_df, ff_stats_df, group){
     warn("DBG: Hardcoded filter: FFentropy > 75%-ile\n")
     q_df = ff_stats_df %>% group_by_(.dots = group) %>%
@@ -31,6 +32,7 @@ filter_results_by_FFentropy_per_group = function(res_df, ff_stats_df, group){
 #' @param config_l Configuration list read by \code{\link{load_config}}
 #' @seealso load_config
 #' @return A filtered res_df
+#' @export
 filter_results_by_funksfam_annotation = function(res_df, config_l){
     # Loads span_6_7_annotations.tsv, keeps families with less than 10 annotations
 
@@ -61,6 +63,7 @@ filter_results_by_funksfam_annotation = function(res_df, config_l){
 #'
 #' @param res_df A results data.frame computed by \code{\link{do_glm_tests()}}
 #' @return A filtered res_df
+#' @export
 filter_results_by_per_test_arbitrary_statistic = function(res_df){
     # This used to be prefiltered to decrease compute time and glm errors
     filtered_res_df = res_df %>% filter(PH_ArbitraryStatistic)
@@ -80,6 +83,7 @@ filter_results_by_per_test_arbitrary_statistic = function(res_df){
 #'
 #' @param res_df A results data.frame computed by \code{\link{do_glm_tests()}}
 #' @return A filtered res_df
+#' @export
 filter_results_by_interesting_DCMCODE = function(res_df){
 
     warn("DBG: Hardcoded filter: DCMCODE_XX\n")
@@ -103,6 +107,7 @@ filter_results_by_interesting_DCMCODE = function(res_df){
 #'
 #' @param res_df A results data.frame computed by \code{\link{do_glm_tests()}}
 #' @return A filtered res_df
+#' @export
 filter_unneeded_tests = function(res_df){
     # Remove unneeded tests
     #
@@ -123,6 +128,7 @@ filter_unneeded_tests = function(res_df){
 #'                    \code{\link{calc_FFvariation_per_group()}}
 #' @param group Either 'HMP_Bodysite' or 'HMP_Bodysubsite'
 #' @return A filtered res_df
+#' @export
 filter_results_all = function(res_df, ff_stats_df, group, config_l){
     res_df %<>% filter_unneeded_tests() %>%
                 filter_results_by_FFentropy_per_group(ff_stats_df, group) %>%
@@ -141,6 +147,7 @@ filter_results_all = function(res_df, ff_stats_df, group, config_l){
 #'                      (does not account for samples that may be dropped if
 #'                       corresponding FUnkSFAM presence is NA)
 #' @return A filtered df
+#' @export
 prefilter_by_arbitrary_statistic = function(df, ph_stats_df){
     warn("\nPrefiltering by ArbitraryStatistic\n")
     ph_names = get_phenos_from_colnames(colnames(df))

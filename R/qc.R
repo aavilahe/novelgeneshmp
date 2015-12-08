@@ -4,6 +4,7 @@
 #'
 #' @param ff_pres A presence-absence logical vector
 #' @return A percentage
+#' @export
 get_percent_present = function(ff_pres){
     return(sum(ff_pres) / length(ff_pres))
 }
@@ -14,6 +15,7 @@ get_percent_present = function(ff_pres){
 #'
 #' @param cat_column A categorical vector
 #' @return Entropy in bits
+#' @export
 get_entropy = function(cat_column){
     return(entropy::entropy(table(cat_column),
                             verbose = FALSE,
@@ -31,6 +33,7 @@ get_entropy = function(cat_column){
 #'
 #' @param cat_column A categorical vector
 #' @return ArbitraryStatistic
+#' @export
 get_arbitrary_statistic = function(cat_column){
     return(sum(table(cat_column) > 4) > 1)
 }
@@ -40,6 +43,7 @@ get_arbitrary_statistic = function(cat_column){
 #' @param df A data.frame in `tidy` format
 #' @param group Either 'HMP_BodySite' or 'HMP_BodySubsite'
 #' @return A data.frame
+#' @export
 calc_nsamples_per_group = function(df, group){
     nsamp_df = df %>% group_by_(.dots = group) %>% tally()
     return(nsamp_df)
@@ -49,6 +53,7 @@ calc_nsamples_per_group = function(df, group){
 #'
 #' @inheritParams calc_nsamples_per_group
 #' @return A data.frame wih Entropy_bits and PercentPresent per FUNKID per group
+#' @export
 calc_FFvariation_per_group = function(df, group){
     variation_df = df %>% gather(FUNKID, Present, starts_with('X')) %>%
                         group_by_(.dots = c(group, 'FUNKID')) %>%
@@ -66,6 +71,7 @@ calc_FFvariation_per_group = function(df, group){
 #' @inheritParams calc_nsamples_per_group
 #' @return A data.frame with Entropy_bits and ArbitraryStatistic per PHENONAME
 #'         per group
+#' @export
 calc_PHvariation_per_group = function(df, group){
     column_names = colnames(df)
     #pheno_names = column_names[column_names %in%

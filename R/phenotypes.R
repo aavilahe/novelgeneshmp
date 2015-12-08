@@ -4,6 +4,7 @@
 #'
 #' @param config_l
 #' @return A list of cleaned data.frames
+#' @export
 load_and_clean_phenotypes = function(config_l){
     # Load
     DCM_raw       = load_pheno(config_l$DCM_fn)
@@ -26,6 +27,7 @@ load_and_clean_phenotypes = function(config_l){
 #'
 #' @param column_names All variable names that may include some phenotype names
 #' @return a vector of phenotype variable names
+#' @export
 get_phenos_from_colnames = function(column_names){
     #column_names = colnames(df)
     pheno_names = column_names[column_names %in%
@@ -47,6 +49,7 @@ get_phenos_from_colnames = function(column_names){
 #' @param srs_map A mapping of SRSID to RANDSID, VISNO and other metadata and
 #'                identifiers
 #' @return A vector of mappable VISNO values
+#' @export
 get_mappable_visnos = function(srs_map){
     mappable_visnos = unique(na.omit(srs_map$VISNO))  # get mappable VISNOs (e.g. 1, 2, 3)
     cat('DBG: Returning mappable VISNOs\n', file = stderr())
@@ -65,6 +68,7 @@ get_mappable_visnos = function(srs_map){
 #'
 #' @param phenos_l A named list of data.frames with phenotype data
 #' @param mappable_visnos A vector of VISNO values that can be mapped to
+#' @export
 check_mappable_phenos = function(phenos_l, mappable_visnos){
     cat('DBG: ----------------------------------------------------\n', file = stderr())
     cat('DBG: Manual check for mapping reads to phenotype by VISNO\n', file = stderr())
@@ -103,6 +107,7 @@ check_mappable_phenos = function(phenos_l, mappable_visnos){
 #' @return A data.frame of VISNO-mappable phenotypes
 #'         Columns: RANDSID, VISNO, SITE, [PHENONAME1, ...]
 #' @seealso \code{\link{check_mappable_phenos}}
+#' @export
 get_visno_mappable_pheno_df = function(phenos_l, mappable_visnos){
     visno_mappable_phenos = c(grep('^DCMCODE_', colnames(phenos_l$DCM_df), value = TRUE),
                              'OCPTN_ST', 'EDLVL_BS', 'SMOKER'
@@ -132,6 +137,7 @@ get_visno_mappable_pheno_df = function(phenos_l, mappable_visnos){
 #' @return A data.frame of VISNO-unmappable phenotypes
 #'         Columns: RANDSID, SITE, [PHENONAME1, ...]
 #' @seealso \code{\link{check_mappable_phenos}}
+#' @export
 get_visno_unmappable_pheno_df = function(phenos_l, mappable_visnos){
     # Joins list_of_dfs, selects (RANDSID, visno_unmappable_phenos)
 

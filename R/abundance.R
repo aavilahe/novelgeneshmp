@@ -7,6 +7,7 @@
 #' @return A presence-absence data.frame.
 #'          Rows are samples indexed by SRSID (first column)
 #'          Columns except the first are FUnkSFAMs
+#' @export
 counts_to_presence = function(cnts_df, threshold = 4){
     FUNKIDs = grep('SRSID', colnames(cnts_df), invert = TRUE, value = TRUE)
     pres_df = cnts_df %>% mutate_each_(funs(ifelse(. > threshold, TRUE, FALSE)),
@@ -19,6 +20,7 @@ counts_to_presence = function(cnts_df, threshold = 4){
 #' @param config_l A list parsed from config file
 #' @return A presence-absence data.frame.
 #' @seealso \code{\link{counts_to_presence}}
+#' @export
 prepare_abundance = function(config_l){
     cnts_df = load_counts(config_l$counts_fn)
     pres_df = counts_to_presence(cnts_df, config_l$count_threshold)
@@ -29,6 +31,7 @@ prepare_abundance = function(config_l){
 #' @param config_l A list parsed from config file
 #' @return A data.frame with columns:
 #'          SN, RANDSID, VISNO, SRSID, HMP_BodySite, HMP_BodySubsite
+#' @export
 prepare_map = function(config_l){
     GTV_df = clean_gtv(load_pheno(config_l$GTV_fn))
     s2v = load_srs2visno(config_l$srs2visno_fn)
