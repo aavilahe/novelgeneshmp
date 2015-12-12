@@ -295,7 +295,7 @@ plot_FFentropy_by_group(ff_stats_bss_df, 'HMP_BodySubsite')
 #> `stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
 ```
 
-![](example-run_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![](example-run.github_markdown_files/figure-github_markdown/unnamed-chunk-9-1.png)
 
 Fit logistic regression models and test for coefficients significantly larger than zero
 ---------------------------------------------------------------------------------------
