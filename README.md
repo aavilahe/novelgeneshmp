@@ -20,10 +20,10 @@ Or with [devtools](https://github.com/hadley/devtools)
 ```r
 
 library(devtools)
-install_github('aavilahe/novelgeneshmp@dev', subdir = 'novelgeneshmp')
+install_github('aavilaherrera/novelgeneshmp@dev', subdir = 'novelgeneshmp')
 
 # To build vignettes locally (takes a few extra seconds):
-install_github('aavilahe/novelgeneshmp@dev',
+install_github('aavilaherrera/novelgeneshmp@dev',
                subdir = 'novelgeneshmp',
                build_vignettes = TRUE
                )
